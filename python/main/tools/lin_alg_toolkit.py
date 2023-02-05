@@ -46,7 +46,7 @@ class Matrix:
 
 class LinAlgToolkit:
 
-    def is_upper_triangular(matrix: Matrix) -> bool:
+    def is_upper_triangular(matrix: Matrix) -> bool:  # TODO: move to matrix
         """
         Utility function to test whether a give matrix is upper-triangular.
         Returns true if upper-triangular and false otherwise.
@@ -62,7 +62,7 @@ class LinAlgToolkit:
         return True
 
     @staticmethod
-    def get_rank(matrix: list) -> int:
+    def get_rank(matrix: list) -> int:  # TODO: move to matrix
         """
         Rewrites a matrix to row-echelon form, counts the number of non-zero rows
         which is returned as the rank of the matrix.
@@ -77,7 +77,7 @@ class LinAlgToolkit:
         return rank
 
     @staticmethod
-    def tidy_up(matrix: Matrix) -> Matrix:
+    def tidy_up(matrix: Matrix) -> Matrix:  # TODO: move to matrix
         """
         Utility-function to tidy up the contents of a matrix by rounding floats to integers
         where possible or to a maximum of three decimal spaces if value is a floating point.
@@ -95,7 +95,7 @@ class LinAlgToolkit:
         return tidy_matrix
 
     @staticmethod
-    def transpose_matrix(matrix: Matrix) -> Matrix:
+    def transpose_matrix(matrix: Matrix) -> Matrix:  # TODO: move to matrix
         """
         Transposes the input matrix by interchanging the rows and columns. Returns the
         transposed matrix.
