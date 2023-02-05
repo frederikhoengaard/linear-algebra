@@ -3,10 +3,18 @@ from typing import List
 
 class Matrix:
 
-    def __init__(self):
-        self.size = None
+    def __init__(self, matrix_specification: List[List]):
+        """
 
-    def read_matrix(self, filename: str) -> list:
+        :param matrix_specification:
+        """
+        self.data = matrix_specification
+        assert len(set([len(row) for row in matrix_specification]))
+
+        self.size = (len(self.data), len(self.data[0]))
+
+    @staticmethod
+    def read_matrix(filename: str) -> list:
         """
         Reads a .txt-file containing whitespace-separated numeric values in the following form:
         3 3 -2 11
@@ -18,11 +26,11 @@ class Matrix:
         """
         infile = open(filename, 'r')
         matrix = [list(map(float, line.split())) for line in infile.readlines()]
-        if self._validate(matrix):
+        if Matrix._validate(matrix):
             return matrix
 
     @staticmethod
-    def _validate(matrix: List[List]) -> bool:
+    def _validate(matrix: list) -> bool:
         """
         Utility function to validate whether a matrix has an equal number of entries in each row. Returns
         true if given matrix is indeed valid and false otherwise.
@@ -31,6 +39,9 @@ class Matrix:
         for row in matrix:
             row_lengths.add(len(row))
         return len(row_lengths) == 1
+
+    def __getitem__(self, index):
+        return self.data[index]
 
 
 class LinAlgToolkit:
@@ -160,7 +171,7 @@ class LinAlgToolkit:
         rows_B, cols_B = LinAlgToolkit.get_size(matrix_B)
 
         if cols_A != rows_B:
-            return
+            raise MatrixDimensionIncompatibilityError
 
         B_transposed = LinAlgToolkit.transpose_matrix(matrix_B)
 
@@ -198,7 +209,7 @@ class LinAlgToolkit:
 
         """
         augmented_matrix = [row for row in matrix]
-        m, n = LinAlgToolkit.get_size(augmented_matrix)
+        m, n = augmented_matrix.size
         n_variables = n - 1
         evaluated_rows = []
 
