@@ -1,47 +1,5 @@
 from typing import List
-
-
-class Matrix:
-
-    def __init__(self, matrix_specification: List[List]):
-        """
-
-        :param matrix_specification:
-        """
-        self.data = matrix_specification
-        assert len(set([len(row) for row in matrix_specification]))
-
-        self.size = (len(self.data), len(self.data[0]))
-
-    @staticmethod
-    def read_matrix(filename: str) -> list:
-        """
-        Reads a .txt-file containing whitespace-separated numeric values in the following form:
-        3 3 -2 11
-        2 0 3 -1
-        -1 -2 0 -5
-        ...
-        Where each line of the text file will represent a row in the returned matrix. The matrix
-        is returned as a list of lists, where each nested list corresponds to a row of the input data.
-        """
-        infile = open(filename, 'r')
-        matrix = [list(map(float, line.split())) for line in infile.readlines()]
-        if Matrix._validate(matrix):
-            return matrix
-
-    @staticmethod
-    def _validate(matrix: list) -> bool:
-        """
-        Utility function to validate whether a matrix has an equal number of entries in each row. Returns
-        true if given matrix is indeed valid and false otherwise.
-        """
-        row_lengths = set()
-        for row in matrix:
-            row_lengths.add(len(row))
-        return len(row_lengths) == 1
-
-    def __getitem__(self, index):
-        return self.data[index]
+from models import Matrix
 
 
 class LinAlgToolkit:
