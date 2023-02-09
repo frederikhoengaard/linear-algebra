@@ -15,8 +15,17 @@ class Matrix:
         self.size = (len(self.data), len(self.data[0]))
         self.T = [[self.data[row][col] for row in range(self.size[0])] for col in range(self.size[1])]
 
-    def __eq__(self, other):
-        return self.data == other.data
+    def __add__(self, matrix):
+        raise NotImplementedError
+
+    def __sub__(self, matrix):
+        raise NotImplementedError
+
+    def __mul__(self, other):
+        raise NotImplementedError
+
+    def __eq__(self, matrix):
+        return self.data == matrix.data
 
     def __repr__(self):
         out = ["  ".join([str(item) for item in row]) for row in self.data]
@@ -139,32 +148,132 @@ class MatrixOperations:
         return Matrix(tidy_matrix)
 
     @staticmethod
-    def matrix_multiply(matrix_A: Matrix, matrix_B: Matrix) -> Matrix:
+    def matrix_multiply(matrix_a: Matrix, matrix_b: Matrix) -> Matrix:
         """
         Returns the product of matrix_A multiplied by matrix_B in this order.
         Returns nothing if product is not defined - that is matrix_A not having
         as many columns as matrix_B has rows.
         """
-        _, cols_A = matrix_A.size
-        rows_B, cols_B = matrix_B.size
+        _, cols_a = matrix_a.size
+        rows_b, cols_b = matrix_b.size
 
-        if cols_A != rows_B:
+        if cols_a != rows_b:
             raise MatrixDimensionIncompatibilityError
 
-        B_transposed = MatrixOperations.transpose_matrix(matrix_B)
+        b_transposed = MatrixOperations.transpose_matrix(matrix_b)
 
         out = []
-        for row in matrix_A:
+        for row in matrix_a:
             tmp = []
-            for i in range(cols_B):
+            for i in range(cols_b):
                 val = 0
-                col_to_multiply = B_transposed.data[i]
+                col_to_multiply = b_transposed.data[i]
                 for j in range(len(col_to_multiply)):
                     val += row[j] * col_to_multiply[j]
                 tmp.append(val)
             out.append(tmp)
         return Matrix(out)
 
+    @staticmethod
+    def invert_matrix(matrix: Matrix) -> Matrix:
+        """
+        Takes a matrix as parameter, returns nothing if parameter matrix is nonsquare and thus non-invertible.
+        The function then proceeds to check if the equation system has exactly one solution, and if not it will return
+        nothing as the matrix is non-invertible.
+
+        Finally it will adjoin the input parameter matrix with its corresponding identity matrix and reduce it with
+        Gauss-Jordan elimination in order to return the inverted matrix.
+        """
+        m, n = matrix.size
+        assert m == n
+        identity_matrix = MatrixOperations.create_identity_matrix(m)
+
+        # only matrices with exactly one solution are invertible, so lets use our gauss-jordan script
+        reduced_matrix = Matrix([row for row in matrix.data])
+        reduced_matrix = MatrixOperations.reduced_row_echelon(reduced_matrix)
+
+        for row in reduced_matrix.data:  # check for zero-row
+            invertible = False
+            for value in row:
+                if value != 0:
+                    invertible = True
+            if not invertible:
+                print('not invertible')
+                return
+
+        adjoined_matrix = []
+        for i in range(m):  # TODO: make this its own method
+            tmp = [val for val in matrix.data[i]]
+            tmp.extend(identity_matrix.data[i])
+            adjoined_matrix.append(tmp)
+
+        adjoined_matrix = Matrix(adjoined_matrix)
+
+        reduced_adjoined_matrix = MatrixOperations.reduced_row_echelon(adjoined_matrix)
+        inverted_matrix = []
+        for i in range(m):
+            inverted_matrix.append([reduced_adjoined_matrix.data[i][j] for j in range(n, (2 * n))])
+        return Matrix(inverted_matrix)
+
+    @staticmethod
+    def create_identity_matrix(order: int) -> Matrix:
+        """
+        Returns the identity matrix of a given order as a list of lists.
+        """
+        out = []
+        for i in range(order):
+            tmp = []
+            for j in range(order):
+                if i == j:
+                    tmp.append(1)
+                else:
+                    tmp.append(0)
+            out.append(tmp)
+        return Matrix(out)
+
+    @staticmethod
+    def determinant(matrix: Matrix) -> float:
+        """
+        This function takes an n x n matrix as a list of nested lists as input. It then
+        calculates and returns its determinant by use of cofactor expansion.
+        """
+        m,n = matrix.size
+
+        if m != n:
+            raise ValueError("Non-square matrices do not have determinants!")
+
+        else:
+            if m == 1 and n == 1:
+                return matrix.data[0][0]
+
+            elif m == 2:
+                val = matrix.data[0][0] * matrix.data[1][1] - matrix.data[0][1] * matrix.data[1][0]
+                return val
+
+            else:
+                det = 0
+                new_matrix = Matrix([row for row in matrix[1:]])
+                new_matrix = MatrixOperations.transpose_matrix(new_matrix)
+                for i in range(n):
+                    pivot = matrix[0][i]
+                    cols_to_select = [j for j in range(n) if j != i]
+                    minor_matrix = MatrixOperations.transpose_matrix(Matrix([new_matrix[col] for col in cols_to_select]))
+
+                    if i % 2 == 0: # cofactor is positive
+                        det += pivot * MatrixOperations.determinant(minor_matrix)
+                    else: # cofactor is negative
+                        det -= pivot * MatrixOperations.determinant(minor_matrix)
+                return det
+
 
 class MatrixDimensionIncompatibilityError(Exception):
     """Raised if operation on matrices is not possible due to dimensions of concerned matrices"""
+
+
+if __name__ == '__main__':
+    matrix = Matrix([[1,2,3],[0,1,-1],[2,2,2]])
+    inverse = MatrixOperations.invert_matrix(matrix)
+    print(inverse.__repr__())
+
+    print(MatrixOperations.matrix_multiply(inverse, matrix).__repr__())
+
