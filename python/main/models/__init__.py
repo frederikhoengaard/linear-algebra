@@ -1,1 +1,1 @@
-from models.matrix import Matrix
+from models.matrix import Matrix, MatrixOperations
