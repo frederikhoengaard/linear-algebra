@@ -265,6 +265,33 @@ class MatrixOperations:
                         det -= pivot * MatrixOperations.determinant(minor_matrix)
                 return det
 
+    @staticmethod
+    def determinant_rowreduction(matrix: Matrix) -> float:
+        """
+        This function takes an n x n matrix as a list of nested lists as input.
+
+        It returns the determinant of the triangular matrix calculated as the product
+        of the elements of its main diagonal.
+        """
+        tmp = Matrix([row for row in matrix])
+        m, n = matrix.size
+
+        if m != n:
+            raise ValueError("Non-square matrices do not have determinants!")
+
+        else:
+            for i in range(n - 1):
+                var = tmp.data[i][i]
+                if var != 0:
+                    for j in range(i + 1, n):
+                        multiplier = tmp.data[j][i] / var
+                        for k in range(n):
+                            tmp.data[j][k] -= (multiplier * tmp.data[i][k])
+            det = 1
+            for i in range(n):
+                det *= tmp.data[i][i]
+            return det
+
 
 class MatrixDimensionIncompatibilityError(Exception):
     """Raised if operation on matrices is not possible due to dimensions of concerned matrices"""
