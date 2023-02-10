@@ -16,7 +16,19 @@ class Matrix:
         self.T = [[self.data[row][col] for row in range(self.size[0])] for col in range(self.size[1])]
 
     def __add__(self, matrix):
-        raise NotImplementedError
+        m_a, n_a = self.size
+        m_b, n_b = matrix.size
+
+        if m_a != m_b or n_a != n_b:
+            raise MatrixDimensionIncompatibilityError()
+
+        matrix_sum = []
+        for i in range(m_a):
+            row = []
+            for j in range(n_a):
+                row.append(self.data[i][j] + matrix.data[i][j])
+            matrix_sum.append(row)
+        return Matrix(matrix_sum)
 
     def __sub__(self, matrix):
         raise NotImplementedError
@@ -298,9 +310,8 @@ class MatrixDimensionIncompatibilityError(Exception):
 
 
 if __name__ == '__main__':
-    matrix = Matrix([[1,2,3],[0,1,-1],[2,2,2]])
-    inverse = MatrixOperations.invert_matrix(matrix)
-    print(inverse.__repr__())
-
-    print(MatrixOperations.matrix_multiply(inverse, matrix).__repr__())
+    a = Matrix([[1,2],[3,4]])
+    b = Matrix([[1,1],[1,1]])
+    c = a + b
+    print(c)
 

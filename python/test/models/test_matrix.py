@@ -14,3 +14,17 @@ def test_transpose(specification, transpose):
 
     assert transpose == MatrixOperations.transpose_matrix(sample)
     assert sample.data == transpose.T
+
+
+@pytest.mark.parametrize("matrix_a, matrix_b, expectation", [
+    (
+            Matrix([[1, 2], [3, 4]]),
+            Matrix([[1, 1], [1, 1]]),
+            Matrix([[2, 3], [4, 5]])),
+    (
+            Matrix([[1, 1, 1], [1, 1, 1], [1, 1, 1]]),
+            Matrix([[-1, -1, -1], [-1, -1, -1], [-1, -1, -1]]),
+            Matrix([[0, 0, 0], [0, 0, 0], [0, 0, 0]]))
+])
+def test_add(matrix_a, matrix_b, expectation):
+    assert matrix_a + matrix_b == expectation
