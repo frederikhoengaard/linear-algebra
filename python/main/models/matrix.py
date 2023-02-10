@@ -33,14 +33,27 @@ class Matrix:
 
         return Matrix(matrix_sum)
 
-    def __sub__(self, matrix):
-        raise NotImplementedError
+    def __sub__(self, other_matrix):
+        m_a, n_a = self.size
+
+        if self.size != other_matrix.size:
+            raise MatrixDimensionIncompatibilityError()
+
+        matrix_difference = [
+            [
+                self.data[row_num][col_num] - other_matrix.data[row_num][col_num]
+                for col_num in range(n_a)
+            ]
+            for row_num in range(m_a)
+        ]
+
+        return Matrix(matrix_difference)
 
     def __mul__(self, other):
         raise NotImplementedError
 
     def __eq__(self, matrix):
-        return self.data == matrix.data
+        return self.data == matrix.data and self.T == matrix.T
 
     def __repr__(self):
         out = ["  ".join([str(item) for item in row]) for row in self.data]
