@@ -331,18 +331,21 @@ class MatrixOperations:
         if m != n:
             raise ValueError("Non-square matrices do not have determinants!")
 
-        else:
-            for i in range(n - 1):
-                var = tmp.data[i][i]
-                if var != 0:
-                    for j in range(i + 1, n):
-                        multiplier = tmp.data[j][i] / var
-                        for k in range(n):
-                            tmp.data[j][k] -= multiplier * tmp.data[i][k]
-            det = 1
-            for i in range(n):
-                det *= tmp.data[i][i]
-            return det
+        # the below algo performs row-reduction to make the matrix upper-triangular.
+        # For each row_i except the last, we take the value x that is on the diagonal.
+        # For each subsequent row_j we compute a multiplier m such that row_j minus row_i*m
+        # will make the entry matrix[j][i] = 0
+        for i in range(n - 1):
+            var = tmp.data[i][i]
+            if var != 0:
+                for j in range(i + 1, n):
+                    multiplier = tmp.data[j][i] / var
+                    for k in range(n):
+                        tmp.data[j][k] -= multiplier * tmp.data[i][k]
+        det = 1
+        for i in range(n):
+            det *= tmp.data[i][i]
+        return det
 
 
 class MatrixDimensionIncompatibilityError(Exception):
