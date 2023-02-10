@@ -20,9 +20,9 @@ def polynomial_curve_fitting(matrix: Matrix) -> list:
     augmented_matrix = []
     for i in range(n_coordinates):
         row = [1]
-        x,y = matrix[i]
-        for j in range(1,n_coordinates):
-            row.append(x ** j)
+        x, y = matrix[i]
+        for j in range(1, n_coordinates):
+            row.append(x**j)
         row.append(y)
         augmented_matrix.append(row)
 
@@ -41,15 +41,15 @@ def least_squares_regression(matrix: list) -> list:
     """
     matrix.sort()
 
-    X = [[1,coordinate[0]] for coordinate in matrix]
+    X = [[1, coordinate[0]] for coordinate in matrix]
     X_transposed = LinAlgToolkit.transpose_matrix(X)
 
     # Calculate X^T * X
-    XTX = LinAlgToolkit.dot_product(X_transposed,X)
+    XTX = LinAlgToolkit.dot_product(X_transposed, X)
 
     # Calculate X^T * Y
     Y = [[coordinate[1]] for coordinate in matrix]
-    XTY = LinAlgToolkit.dot_product(X_transposed,Y)
+    XTY = LinAlgToolkit.dot_product(X_transposed, Y)
 
     # Invert XTX, define slope coefficient a and intercept b
     XTX_inverted = LinAlgToolkit.invert_matrix(XTX)
@@ -114,7 +114,9 @@ def equation_of_line_two_points(matrix: Matrix) -> list:
     x,y and b.
     """
     transposed_input = matrix.T
-    x = MatrixOperations.determinant_rowreduction([transposed_input[1], [1, 1]])  # TODO: FIX
+    x = MatrixOperations.determinant_rowreduction(
+        [transposed_input[1], [1, 1]]
+    )  # TODO: FIX
     y = -1 * MatrixOperations.determinant_rowreduction([transposed_input[0], [1, 1]])
     b = MatrixOperations.determinant_rowreduction(matrix)
     return [x, y, b]
