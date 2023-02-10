@@ -50,7 +50,17 @@ class Matrix:
         return Matrix(matrix_difference)
 
     def __mul__(self, other):
-        raise NotImplementedError
+        m, n = self.size
+        if type(other) == int or type(other) == float:
+            # scalar multiply
+            result = [[self.data[row_num][col_num] * other for col_num in range(n)] for row_num in range(m)]
+            return Matrix(result)
+        elif type(other) == Matrix:
+            # matrix multiplication
+            return MatrixOperations.matrix_multiply(self, other)
+        else:
+            # TODO: make a multiplication error
+            raise MatrixDimensionIncompatibilityError
 
     def __eq__(self, matrix):
         return self.data == matrix.data and self.T == matrix.T
