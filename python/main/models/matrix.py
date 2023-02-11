@@ -19,11 +19,11 @@ class Matrix:
 
     def to_latex(self, name=None):
         if name is not None:
-            out = f"{name}"+"=&\left[\\begin{array}"
+            out = f"{name}" + "=\left[\\begin{array}"
         else:
-            out = "&\left[\\begin{array}"
+            out = "\left[\\begin{array}"
 
-        out += "{" + "c"*self.size[1] + "}"
+        out += "{" + "c" * self.size[1] + "}"
 
         for i in range(len(self.data)):
             if i == len(self.data) - 1:
@@ -70,7 +70,10 @@ class Matrix:
         m, n = self.size
         if type(other) == int or type(other) == float:
             # scalar multiply
-            result = [[self.data[row_num][col_num] * other for col_num in range(n)] for row_num in range(m)]
+            result = [
+                [self.data[row_num][col_num] * other for col_num in range(n)]
+                for row_num in range(m)
+            ]
             return Matrix(result)
         elif type(other) == Matrix:
             # matrix multiplication
@@ -363,6 +366,7 @@ class MatrixOperations:
                     multiplier = tmp.data[j][i] / var
                     for k in range(n):
                         tmp.data[j][k] -= multiplier * tmp.data[i][k]
+        assert MatrixOperations.is_upper_triangular(tmp)
         det = 1
         for i in range(n):
             det *= tmp.data[i][i]
@@ -375,4 +379,5 @@ class MatrixDimensionIncompatibilityError(Exception):
 
 if __name__ == "__main__":
     a = Matrix([[1, 2], [3, 4]])
-    a.to_latex(name="A")
+    print(a.to_latex(name="A"))
+
