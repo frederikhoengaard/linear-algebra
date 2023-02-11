@@ -2,7 +2,6 @@ from typing import List
 
 
 class Matrix:
-
     def __init__(self, matrix_specification: List[List]):
         """
         Initializes a Matrix object given some specification
@@ -13,19 +12,58 @@ class Matrix:
         assert len(set([len(row) for row in matrix_specification])) == 1
 
         self.size = (len(self.data), len(self.data[0]))
-        self.T = [[self.data[row][col] for row in range(self.size[0])] for col in range(self.size[1])]
+        self.T = [
+            [self.data[row][col] for row in range(self.size[0])]
+            for col in range(self.size[1])
+        ]
 
-    def __add__(self, matrix):
-        raise NotImplementedError
+    def __add__(self, other_matrix):
+        m_a, n_a = self.size
 
-    def __sub__(self, matrix):
-        raise NotImplementedError
+        if self.size != other_matrix.size:
+            raise MatrixDimensionIncompatibilityError()
+
+        matrix_sum = [
+            [
+                self.data[row_num][col_num] + other_matrix.data[row_num][col_num]
+                for col_num in range(n_a)
+            ]
+            for row_num in range(m_a)
+        ]
+
+        return Matrix(matrix_sum)
+
+    def __sub__(self, other_matrix):
+        m_a, n_a = self.size
+
+        if self.size != other_matrix.size:
+            raise MatrixDimensionIncompatibilityError()
+
+        matrix_difference = [
+            [
+                self.data[row_num][col_num] - other_matrix.data[row_num][col_num]
+                for col_num in range(n_a)
+            ]
+            for row_num in range(m_a)
+        ]
+
+        return Matrix(matrix_difference)
 
     def __mul__(self, other):
-        raise NotImplementedError
+        m, n = self.size
+        if type(other) == int or type(other) == float:
+            # scalar multiply
+            result = [[self.data[row_num][col_num] * other for col_num in range(n)] for row_num in range(m)]
+            return Matrix(result)
+        elif type(other) == Matrix:
+            # matrix multiplication
+            return MatrixOperations.matrix_multiply(self, other)
+        else:
+            # TODO: make a multiplication error
+            raise MatrixDimensionIncompatibilityError
 
     def __eq__(self, matrix):
-        return self.data == matrix.data
+        return self.data == matrix.data and self.T == matrix.T
 
     def __repr__(self):
         out = ["  ".join([str(item) for item in row]) for row in self.data]
@@ -36,7 +74,6 @@ class Matrix:
 
 
 class MatrixOperations:
-
     @staticmethod
     def transpose_matrix(matrix: Matrix):
         """
@@ -45,7 +82,9 @@ class MatrixOperations:
         """
         m, n = matrix.size
 
-        transposed_matrix = [[matrix.data[row][col] for row in range(m)] for col in range(n)]
+        transposed_matrix = [
+            [matrix.data[row][col] for row in range(m)] for col in range(n)
+        ]
         return Matrix(transposed_matrix)
 
     @staticmethod
@@ -56,7 +95,7 @@ class MatrixOperations:
         """
         m, n = matrix.size
         if m != n:
-            raise ValueError('Non-square matrices cannot be triangular!')
+            raise ValueError("Non-square matrices cannot be triangular!")
 
         for i in range(1, n):
             for k in range(0, i):
@@ -81,9 +120,7 @@ class MatrixOperations:
 
     @staticmethod
     def reduced_row_echelon(matrix: Matrix) -> Matrix:
-        """
-
-        """
+        """ """
         augmented_matrix = Matrix([row for row in matrix.data])
         m, n = augmented_matrix.size
         n_variables = n - 1
@@ -94,7 +131,9 @@ class MatrixOperations:
             maxval = 0
 
             for j in range(m):
-                if (abs(augmented_matrix.data[j][i]) > abs(maxval)) and j not in evaluated_rows:
+                if (
+                    abs(augmented_matrix.data[j][i]) > abs(maxval)
+                ) and j not in evaluated_rows:
                     maxrow = j
                     maxval = augmented_matrix[j][i]
             evaluated_rows.append(maxrow)
@@ -104,13 +143,19 @@ class MatrixOperations:
 
             other_rows = [row for row in range(m) if row != maxrow]
             reciprocal = 1 / augmented_matrix.data[maxrow][i]
-            new_row = [coefficient * reciprocal for coefficient in augmented_matrix.data[maxrow]]
+            new_row = [
+                coefficient * reciprocal
+                for coefficient in augmented_matrix.data[maxrow]
+            ]
 
             augmented_matrix.data[maxrow] = new_row
 
             for row_num in other_rows:
                 multiplier = augmented_matrix.data[row_num][i]
-                new_other_row = [augmented_matrix.data[row_num][k] - (multiplier * new_row[k]) for k in range(n)]
+                new_other_row = [
+                    augmented_matrix.data[row_num][k] - (multiplier * new_row[k])
+                    for k in range(n)
+                ]
                 augmented_matrix.data[row_num] = new_other_row
 
         augmented_matrix = MatrixOperations.tidy_up(augmented_matrix)
@@ -198,7 +243,7 @@ class MatrixOperations:
                 if value != 0:
                     invertible = True
             if not invertible:
-                print('not invertible')
+                print("not invertible")
                 return
 
         adjoined_matrix = []
@@ -212,7 +257,9 @@ class MatrixOperations:
         reduced_adjoined_matrix = MatrixOperations.reduced_row_echelon(adjoined_matrix)
         inverted_matrix = []
         for i in range(m):
-            inverted_matrix.append([reduced_adjoined_matrix.data[i][j] for j in range(n, (2 * n))])
+            inverted_matrix.append(
+                [reduced_adjoined_matrix.data[i][j] for j in range(n, (2 * n))]
+            )
         return Matrix(inverted_matrix)
 
     @staticmethod
@@ -237,7 +284,7 @@ class MatrixOperations:
         This function takes an n x n matrix as a list of nested lists as input. It then
         calculates and returns its determinant by use of cofactor expansion.
         """
-        m,n = matrix.size
+        m, n = matrix.size
 
         if m != n:
             raise ValueError("Non-square matrices do not have determinants!")
@@ -247,7 +294,10 @@ class MatrixOperations:
                 return matrix.data[0][0]
 
             elif m == 2:
-                val = matrix.data[0][0] * matrix.data[1][1] - matrix.data[0][1] * matrix.data[1][0]
+                val = (
+                    matrix.data[0][0] * matrix.data[1][1]
+                    - matrix.data[0][1] * matrix.data[1][0]
+                )
                 return val
 
             else:
@@ -257,11 +307,13 @@ class MatrixOperations:
                 for i in range(n):
                     pivot = matrix[0][i]
                     cols_to_select = [j for j in range(n) if j != i]
-                    minor_matrix = MatrixOperations.transpose_matrix(Matrix([new_matrix[col] for col in cols_to_select]))
+                    minor_matrix = MatrixOperations.transpose_matrix(
+                        Matrix([new_matrix[col] for col in cols_to_select])
+                    )
 
-                    if i % 2 == 0: # cofactor is positive
+                    if i % 2 == 0:  # cofactor is positive
                         det += pivot * MatrixOperations.determinant(minor_matrix)
-                    else: # cofactor is negative
+                    else:  # cofactor is negative
                         det -= pivot * MatrixOperations.determinant(minor_matrix)
                 return det
 
@@ -279,28 +331,29 @@ class MatrixOperations:
         if m != n:
             raise ValueError("Non-square matrices do not have determinants!")
 
-        else:
-            for i in range(n - 1):
-                var = tmp.data[i][i]
-                if var != 0:
-                    for j in range(i + 1, n):
-                        multiplier = tmp.data[j][i] / var
-                        for k in range(n):
-                            tmp.data[j][k] -= (multiplier * tmp.data[i][k])
-            det = 1
-            for i in range(n):
-                det *= tmp.data[i][i]
-            return det
+        # the below algo performs row-reduction to make the matrix upper-triangular.
+        # For each row_i except the last, we take the value x that is on the diagonal.
+        # For each subsequent row_j we compute a multiplier m such that row_j minus row_i*m
+        # will make the entry matrix[j][i] = 0
+        for i in range(n - 1):
+            var = tmp.data[i][i]
+            if var != 0:
+                for j in range(i + 1, n):
+                    multiplier = tmp.data[j][i] / var
+                    for k in range(n):
+                        tmp.data[j][k] -= multiplier * tmp.data[i][k]
+        det = 1
+        for i in range(n):
+            det *= tmp.data[i][i]
+        return det
 
 
 class MatrixDimensionIncompatibilityError(Exception):
     """Raised if operation on matrices is not possible due to dimensions of concerned matrices"""
 
 
-if __name__ == '__main__':
-    matrix = Matrix([[1,2,3],[0,1,-1],[2,2,2]])
-    inverse = MatrixOperations.invert_matrix(matrix)
-    print(inverse.__repr__())
-
-    print(MatrixOperations.matrix_multiply(inverse, matrix).__repr__())
-
+if __name__ == "__main__":
+    a = Matrix([[1, 2], [3, 4]])
+    b = Matrix([[1, 1], [1, 1]])
+    c = a + b
+    print(c)

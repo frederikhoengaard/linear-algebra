@@ -11,6 +11,5 @@ def read_csv(filename: str, sep=",") -> Matrix:
     :param sep: separator to use to parse input file
     :returns: a Matrix object according to the specification
     """
-    infile = open(filename, 'r')
+    infile = open(filename, "r")
     return Matrix([list(map(float, line.split(sep))) for line in infile.readlines()])
-
