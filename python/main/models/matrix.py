@@ -86,7 +86,10 @@ class Matrix:
         return self.data == matrix.data and self.T == matrix.T
 
     def __repr__(self):
-        out = ["    [" + "  ".join([str(item)+"," for item in row]) + "]" for row in self.data]
+        out = [
+            "    [" + "  ".join([str(item) + "," for item in row]) + "]"
+            for row in self.data
+        ]
         return "Matrix([\n" + "\n".join(out) + "\n])"
 
     def __getitem__(self, index):
@@ -106,6 +109,24 @@ class MatrixOperations:
             [matrix.data[row][col] for row in range(m)] for col in range(n)
         ]
         return Matrix(transposed_matrix)
+
+    @staticmethod
+    def make_upper_triangular(matrix: Matrix) -> Matrix:
+        tmp = Matrix([row for row in matrix.data])
+        # TODO: assert square
+        m, n = tmp.size
+
+        for i in range(n - 1):
+            var = tmp.data[i][i]
+            if var != 0:
+                for j in range(i + 1, n):
+                    multiplier = tmp.data[j][i] / var
+                    for k in range(n):
+                        tmp.data[j][k] -= multiplier * tmp.data[i][k]
+                        
+        tmp.T = MatrixOperations.transpose_matrix(tmp).data
+        return tmp
+
 
     @staticmethod
     def is_upper_triangular(matrix: Matrix) -> bool:
@@ -192,6 +213,7 @@ class MatrixOperations:
                     augmented_matrix.data[variable] = augmented_matrix.data[i]
                     augmented_matrix.data[i] = tmp
                     break
+        augmented_matrix.T = MatrixOperations.transpose_matrix(augmented_matrix).data
         return augmented_matrix
 
     @staticmethod
@@ -288,7 +310,7 @@ class MatrixOperations:
         Returns the identity matrix of a given order as a list of lists.
         """
         out = []
-        for i in range(order):
+        for i in range(order):  # TODO: refactor to list comprehension
             tmp = []
             for j in range(order):
                 if i == j:
