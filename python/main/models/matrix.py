@@ -86,8 +86,8 @@ class Matrix:
         return self.data == matrix.data and self.T == matrix.T
 
     def __repr__(self):
-        out = ["  ".join([str(item) for item in row]) for row in self.data]
-        return "\n".join(out)
+        out = ["    [" + "  ".join([str(item)+"," for item in row]) + "]" for row in self.data]
+        return "Matrix([\n" + "\n".join(out) + "\n])"
 
     def __getitem__(self, index):
         return self.data[index]
