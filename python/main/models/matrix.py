@@ -279,6 +279,10 @@ class MatrixOperations:
         return Matrix(out)
 
     @staticmethod
+    def det(matrix: Matrix) -> float:
+        return MatrixOperations.determinant_rowreduction(matrix)
+
+    @staticmethod
     def determinant(matrix: Matrix) -> float:
         """
         This function takes an n x n matrix as a list of nested lists as input. It then
