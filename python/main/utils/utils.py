@@ -48,5 +48,5 @@ def make_system(vars: List[float], random_seed=42):
         print()
 
 
-if __name__ == '__main__':
-    make_system(vars=[1,-1,3])
+if __name__ == "__main__":
+    make_system(vars=[1, -1, 3])

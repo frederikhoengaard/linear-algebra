@@ -380,4 +380,3 @@ class MatrixDimensionIncompatibilityError(Exception):
 if __name__ == "__main__":
     a = Matrix([[1, 2], [3, 4]])
     print(a.to_latex(name="A"))
-
