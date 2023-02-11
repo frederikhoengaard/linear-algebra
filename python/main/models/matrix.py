@@ -17,6 +17,23 @@ class Matrix:
             for col in range(self.size[1])
         ]
 
+    def to_latex(self, name=None):
+        if name is not None:
+            out = f"{name}"+"=&\left[\\begin{array}"
+        else:
+            out = "&\left[\\begin{array}"
+
+        out += "{" + "c"*self.size[1] + "}"
+
+        for i in range(len(self.data)):
+            if i == len(self.data) - 1:
+                # last row
+                out += " & ".join([str(num) for num in self.data[i]])
+            else:
+                out += " & ".join([str(num) for num in self.data[i]]) + "\\\\"
+        out += "\\end{array}\\right]"
+        return out
+
     def __add__(self, other_matrix):
         m_a, n_a = self.size
 
@@ -358,6 +375,4 @@ class MatrixDimensionIncompatibilityError(Exception):
 
 if __name__ == "__main__":
     a = Matrix([[1, 2], [3, 4]])
-    b = Matrix([[1, 1], [1, 1]])
-    c = a + b
-    print(c)
+    a.to_latex(name="A")
