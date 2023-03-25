@@ -16,4 +16,5 @@ from models import MatrixOperations
 def test_row_echelon_reducer(specification, expected_result):
     matrix = Matrix(specification)
     reduced = Matrix(expected_result)
-    assert reduced == MatrixOperations.reduced_row_echelon(matrix)
+    calculated = MatrixOperations.reduced_row_echelon(matrix)
+    assert reduced == calculated
